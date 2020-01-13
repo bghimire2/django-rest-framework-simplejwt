@@ -45,6 +45,10 @@ DEFAULTS = {
     # Whether to set the flag restricting cookie leaks on cross-site requests.
     # This can be 'Lax', 'Strict', or None to disable the flag.
     'AUTH_COOKIE_SAMESITE': 'Lax',
+    # Whether to include the auth cookie tokens in the response data
+    'RESPONSE_HAS_AUTH_COOKIE_TOKENS': False,
+    # Whether to include the auth cookie expiration date in the response data
+    'RESPONSE_HAS_AUTH_COOKIE_EXPIRATION': True,
 }
 
 IMPORT_STRINGS = (

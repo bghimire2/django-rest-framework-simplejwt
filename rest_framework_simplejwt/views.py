@@ -79,6 +79,11 @@ class TokenCookieViewMixin:
             httponly=True,
             samesite=api_settings.AUTH_COOKIE_SAMESITE,
         )
+        if api_settings.RESPONSE_HAS_AUTH_COOKIE_EXPIRATION is True:
+            response.data['expires'] = response.cookies[api_settings.AUTH_COOKIE]['expires']
+        if api_settings.RESPONSE_HAS_AUTH_COOKIE_TOKENS is False:
+            del response.data['access']
+
         if 'refresh' in data:
             response.set_cookie(
                 '{}_refresh'.format(api_settings.AUTH_COOKIE), data['refresh'],
@@ -89,6 +94,8 @@ class TokenCookieViewMixin:
                 httponly=True,
                 samesite=api_settings.AUTH_COOKIE_SAMESITE,
             )
+            if api_settings.RESPONSE_HAS_AUTH_COOKIE_TOKENS is False:
+                del response.data['refresh']
         return response
 
     def get_refresh_token_expiration(self):
