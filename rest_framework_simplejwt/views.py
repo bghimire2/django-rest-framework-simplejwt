@@ -9,7 +9,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from rest_framework_simplejwt.settings import api_settings
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
 from . import serializers
 from .authentication import AUTH_HEADER_TYPES
 from .exceptions import InvalidToken, TokenError
@@ -79,6 +79,19 @@ class TokenCookieViewMixin:
             httponly=True,
             samesite=api_settings.AUTH_COOKIE_SAMESITE,
         )
+
+        access_token = AccessToken(data['access'])
+        random_token = AccessToken()[api_settings.JTI_CLAIM]
+        response.set_cookie(
+            '{}_dt'.format(api_settings.AUTH_COOKIE), random_token,
+            expires=datetime.fromtimestamp(access_token['exp']),
+            domain=api_settings.AUTH_COOKIE_DOMAIN,
+            path=api_settings.AUTH_COOKIE_PATH,
+            secure=api_settings.AUTH_COOKIE_SECURE or None,
+            httponly=False,
+            samesite=api_settings.AUTH_COOKIE_SAMESITE,
+        )
+
         if api_settings.RESPONSE_HAS_AUTH_COOKIE_EXPIRATION is True:
             response.data['expires'] = response.cookies[api_settings.AUTH_COOKIE]['expires']
         if api_settings.RESPONSE_HAS_AUTH_COOKIE_TOKENS is False:
@@ -94,6 +107,20 @@ class TokenCookieViewMixin:
                 httponly=True,
                 samesite=api_settings.AUTH_COOKIE_SAMESITE,
             )
+
+            refresh_token = RefreshToken(data['refresh'])
+            random_token = RefreshToken()[api_settings.JTI_CLAIM]
+
+            response.set_cookie(
+                '{}_dt_refresh'.format(api_settings.AUTH_COOKIE), random_token,
+                expires=datetime.fromtimestamp(refresh_token['exp']),
+                domain=api_settings.AUTH_COOKIE_DOMAIN,
+                path=api_settings.AUTH_COOKIE_PATH,
+                secure=api_settings.AUTH_COOKIE_SECURE or None,
+                httponly=False,
+                samesite=api_settings.AUTH_COOKIE_SAMESITE,
+            )
+
             if api_settings.RESPONSE_HAS_AUTH_COOKIE_TOKENS is False:
                 del response.data['refresh']
         return response
@@ -208,7 +235,18 @@ class TokenCookieDeleteView(APIView):
             path=api_settings.AUTH_COOKIE_PATH
         )
         response.delete_cookie(
+            '{}_dt'.format(api_settings.AUTH_COOKIE),
+            domain=api_settings.AUTH_COOKIE_DOMAIN,
+            path=api_settings.AUTH_COOKIE_PATH
+        )
+
+        response.delete_cookie(
             '{}_refresh'.format(api_settings.AUTH_COOKIE),
+            domain=api_settings.AUTH_COOKIE_DOMAIN,
+            path=api_settings.AUTH_COOKIE_PATH,
+        )
+        response.delete_cookie(
+            '{}_dt_refresh'.format(api_settings.AUTH_COOKIE),
             domain=api_settings.AUTH_COOKIE_DOMAIN,
             path=api_settings.AUTH_COOKIE_PATH,
         )
