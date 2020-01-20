@@ -234,12 +234,15 @@ class TokenCookieDeleteView(APIView):
             domain=api_settings.AUTH_COOKIE_DOMAIN,
             path=api_settings.AUTH_COOKIE_PATH
         )
-        response.delete_cookie(
-            '{}_dt'.format(api_settings.AUTH_COOKIE),
+        response.set_cookie(
+            '{}_dt'.format(api_settings.AUTH_COOKIE), random_token,
+            expires='Thu, 01 Jan 1970 00:00:00 GMT',
             domain=api_settings.AUTH_COOKIE_DOMAIN,
-            path=api_settings.AUTH_COOKIE_PATH
+            path=api_settings.AUTH_COOKIE_PATH,
+            secure=api_settings.AUTH_COOKIE_SECURE or None,
+            httponly=False,
+            samesite=api_settings.AUTH_COOKIE_SAMESITE,
         )
-
         response.delete_cookie(
             '{}_refresh'.format(api_settings.AUTH_COOKIE),
             domain=api_settings.AUTH_COOKIE_DOMAIN,
