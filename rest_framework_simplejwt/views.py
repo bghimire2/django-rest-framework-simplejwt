@@ -235,7 +235,7 @@ class TokenCookieDeleteView(APIView):
             path=api_settings.AUTH_COOKIE_PATH
         )
         response.set_cookie(
-            '{}_dt'.format(api_settings.AUTH_COOKIE), random_token,
+            '{}_dt'.format(api_settings.AUTH_COOKIE), '',
             expires='Thu, 01 Jan 1970 00:00:00 GMT',
             domain=api_settings.AUTH_COOKIE_DOMAIN,
             path=api_settings.AUTH_COOKIE_PATH,
